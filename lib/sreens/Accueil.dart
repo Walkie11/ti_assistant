@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ti_asistan/sreens/accueil_screen.dart';
 import 'package:ti_asistan/utiltaires/fablocation.dart';
 import 'package:ti_asistan/widgets/bottomnavbar.dart';
+import 'package:ti_asistan/widgets/micro.dart';
 
 class Accueil extends StatefulWidget {
   const Accueil({super.key});
@@ -14,21 +15,7 @@ class _AccueilState extends State<Accueil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: GestureDetector(
-        child: FloatingActionButton.large(
-          onPressed: () {
-          },
-
-          backgroundColor: const Color.fromARGB(255, 66, 54, 17),
-          elevation: 0,
-          highlightElevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-            side: BorderSide(color: Colors.white, width: 8),
-          ),
-          child: Icon(Icons.mic, color: Colors.white),
-        ),
-      ),
+      floatingActionButton: Micro(),
       body:AccueilScreen(),
       floatingActionButtonLocation: CustomFabLocation(),
       bottomNavigationBar: Container(

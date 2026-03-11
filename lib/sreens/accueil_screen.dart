@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:ti_asistan/service/apiService.dart';
+import 'package:ti_asistan/service/speechProvider.dart';
 import 'package:ti_asistan/utiltaires/fablocation.dart';
 import 'package:ti_asistan/widgets/bottomnavbar.dart';
 import 'package:ti_asistan/widgets/eventjour.dart';
@@ -31,16 +33,7 @@ class AccueilScreen extends StatefulWidget {
 
 class _AccueilScreenState extends State<AccueilScreen> {
   final service = Apiservice();
-  SpeechToText speech = SpeechToText();
-  String text = "Appuyez pour parler";
-
-  // 2. Crée une fonction pour changer le texte
-  void changerTexte(String nouveauTexte) {
-    setState(() {
-      text = nouveauTexte;
-    });
-  }
-
+  
   List<Evenements> events = List.generate(
     8,
     (index) => Evenements(
@@ -52,6 +45,8 @@ class _AccueilScreenState extends State<AccueilScreen> {
   );
   @override
   Widget build(BuildContext context) {
+    final speechProvider = Provider.of<Speechprovider>(context, listen: false);
+
     return Scaffold(
      
       body: Column(
@@ -63,7 +58,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
             children: [
               Column(
                 children: [
-                  Info(text: text),
+                  Info(text: speechProvider.text),
                   SizedBox(height: 10),
                   Productivite(),
                 ],

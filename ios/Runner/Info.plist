@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>NSMicrophoneUsageDescription</key>
+<string>Ti Asistan a besoin d'accéder au micro pour écouter vos commandes vocales.</string>
+<key>NSSpeechRecognitionUsageDescription</key>
+<string>Ti Asistan utilise la reconnaissance vocale pour transformer vos paroles en texte pour traiter l'intention.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -45,5 +49,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
 </dict>
 </plist>
