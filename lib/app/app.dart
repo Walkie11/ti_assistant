@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:ti_asistan/sreens/accueil.dart';
+import 'package:ti_asistan/sreens/Accueil.dart';
+import 'package:ti_asistan/sreens/calendrier_screen.dart';
+import 'package:ti_asistan/sreens/projet_screen.dart';
+import 'package:ti_asistan/sreens/taches_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,9 +14,24 @@ class MyApp extends StatelessWidget {
       title: 'Ti Asistan',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 10, 10, 10)),
+        primaryColor: const Color.fromARGB(255, 202, 97, 12),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 10, 10, 10),
+          brightness: Brightness.light
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 10,
+          )
       ),
-      home: const Accueil(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => Accueil(),
+          '/calendrier': (context) => Calendrier(),
+          '/tache':(context)=>TachesScreen(),
+          '/projet':(context)=>ProjetScreen(),
+        },
+      
     );
   }
 }

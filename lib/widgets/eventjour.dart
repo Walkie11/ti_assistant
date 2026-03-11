@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ti_asistan/sreens/accueil.dart';
+import 'package:ti_asistan/sreens/accueil_screen.dart';
 import 'package:ti_asistan/widgets/event.dart';
 import 'package:ti_asistan/widgets/liveevent.dart';
 
