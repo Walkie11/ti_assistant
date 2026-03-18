@@ -45,7 +45,6 @@ class _AccueilScreenState extends State<AccueilScreen> {
   );
   @override
   Widget build(BuildContext context) {
-    final speechProvider = Provider.of<Speechprovider>(context, listen: false);
 
     return Scaffold(
      
@@ -58,7 +57,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
             children: [
               Column(
                 children: [
-                  Info(text: speechProvider.text),
+                  Info(),
                   SizedBox(height: 10),
                   Productivite(),
                 ],

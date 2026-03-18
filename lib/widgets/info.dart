@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ti_asistan/service/speechProvider.dart';
+
 class Info extends StatefulWidget {
-  final String text;
-  const Info({super.key,required this.text});
+  const Info({super.key});
 
   @override
   State<Info> createState() => _InfoState();
@@ -11,6 +13,8 @@ class _InfoState extends State<Info> {
 
   @override
   Widget build(BuildContext context) {
+  
+  final speechProvider = Provider.of<Speechprovider>(context, listen: false);
     return Container(
       width: MediaQuery.of(context).size.width * 0.40,
       height: MediaQuery.of(context).size.height * 0.25,
@@ -31,7 +35,7 @@ class _InfoState extends State<Info> {
           left: BorderSide.none,
         ),
       ),
-      child: Text(widget.text),
+      child: Text(speechProvider.text),
     );
   }
 }
