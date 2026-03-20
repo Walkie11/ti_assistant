@@ -1,5 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ti_asistan/widgets/evenement.dart';
+
+class CalendrierI {
+  final String id;
+  final String nom;
+  late bool estActive;
+  late List<Evenement> evenements;
+  CalendrierI(this.id, this.nom, this.estActive);
+}
 
 class Calendrier extends StatefulWidget {
   const Calendrier({super.key});
@@ -46,13 +56,69 @@ class _CalendrierState extends State<Calendrier> {
     // 3. Le build ne s'occupe QUE du dessin
     final double screenWidth = MediaQuery.of(context).size.width;
     final double itemWidth = screenWidth * 0.35;
+    final List<CalendrierI> mesCalendriers = [
+      CalendrierI('1', 'Professionnel', true),
+      CalendrierI('2', 'Personnel', true),
+      CalendrierI('3', 'Loisirs', true),
+    ];
+    final List<Evenement> evenements = [
+      Evenement(
+        "Concert",
+        "LoremIpsum",
+        DateTime.now().add(const Duration(days: 0)),
+        DateTime.now().add(const Duration(days: 0, hours: 5)),
+      ),
+      Evenement(
+        "Concert",
+        "LoremIpsum",
+        DateTime.now().add(const Duration(days: 1, hours: 18)),
+        DateTime.now().add(const Duration(days: 2)),
+      ),
+      Evenement(
+        "Concert",
+        "LoremIpsum",
+        DateTime.now().add(const Duration(days: 1)),
+        DateTime.now().add(const Duration(days: 1, hours: 5)),
+      ),
+      Evenement(
+        "Concert",
+        "LoremIpsum",
+        DateTime.now().add(const Duration(days: 1)),
+        DateTime.now().add(const Duration(days: 1, hours: 5)),
+      ),
+      Evenement(
+        "Concert",
+        "LoremIpsum",
+        DateTime.now().add(const Duration(days: 1)),
+        DateTime.now().add(const Duration(days: 1, hours: 5)),
+      ),
+    ];
 
+    // Le calendrier actuellement coché
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          PopupMenuButton<CalendrierI>(
+            icon: const Icon(Icons.filter_list), // Icône du menu
+            onSelected: (CalendrierI cal) {
+              cal.estActive = !cal.estActive;
+            },
+            itemBuilder: (BuildContext context) {
+              // On transforme la liste d'objets en liste de widgets de menu
+              return mesCalendriers.map((CalendrierI cal) {
+                return CheckedPopupMenuItem<CalendrierI>(
+                  value: cal,
+                  checked: cal.estActive, // Vérification par ID
+                  child: Text(cal.nom),
+                );
+              }).toList(); // Très important de convertir l'Iterable en List
+            },
+          ),
+        ],
         title: Center(
           child: Row(
             children: [
@@ -82,6 +148,45 @@ class _CalendrierState extends State<Calendrier> {
         ),
         child: Icon(Icons.mic, color: Colors.white),
       ),
+      drawerDragStartBehavior: DragStartBehavior.start,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets
+              .zero, // Important pour que le header remplisse tout le haut
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blueAccent),
+              child: Text(
+                'Menu Principal',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Accueil'),
+              onTap: () {
+                Navigator.pop(context); // Ferme le drawer
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_month),
+              title: const Text('Calendrier'),
+              onTap: () {
+                Navigator.pop(context); // Ferme le drawer
+                Navigator.pushNamed(context, '/calendrier');
+              },
+            ),
+            const Divider(), // Une ligne de séparation
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Paramètres'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: Row(
         children: [
           Container(
@@ -107,32 +212,65 @@ class _CalendrierState extends State<Calendrier> {
                   separatorBuilder: (context, index) =>
                       const SizedBox(width: 2),
                   itemCount: 7,
-                  itemBuilder: (context, index) {
+                  itemBuilder: (context, dayIndex) {
+                    final DateTime jourDeLaColonne = datesJrs[dayIndex];
+                    final double hauteurTotaleZone =
+                        MediaQuery.of(context).size.height * 0.883;
+                    final double hauteurHeure = hauteurTotaleZone / 24;
+
                     return Column(
                       children: [
                         Container(
                           alignment: Alignment.center,
-
                           width: itemWidth,
                           height: 50,
                           color: const Color.fromARGB(255, 43, 43, 40),
                           child: Text(
-                            style: TextStyle(color: Colors.white),
-                            jours[index],
+                            jours[dayIndex],
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
+
                         Container(
                           width: itemWidth,
-                          height: MediaQuery.of(context).size.height * 0.884,
+                          height: hauteurTotaleZone,
                           color: const Color.fromARGB(255, 43, 43, 40),
+                          child: Stack(
+                            children: evenements
+                                .where((event) {
+                                  return event.debut.day ==
+                                          jourDeLaColonne.day &&
+                                      event.debut.month ==
+                                          jourDeLaColonne.month &&
+                                      event.debut.year == jourDeLaColonne.year;
+                                })
+                                .map((event) {
+                                  final double topPosition =
+                                      (event.debut.hour +
+                                          (event.debut.minute / 60)) *
+                                      hauteurHeure;
+
+                                  return Positioned(
+                                    top: topPosition,
+                                    left: 0,
+                                    right: 0,
+                                    child: EvenementWidget(evenement: event),
+                                  );
+                                })
+                                .toList(),
+                          ),
                         ),
                       ],
                     );
                   },
                 ),
                 Positioned(
-                  top: 420, // Sa position verticale
+                  top:
+                      (MediaQuery.of(context).size.height * 0.883) /
+                          24 *
+                          (DateTime.now().hour + DateTime.now().minute / 60) +
+                      55, // Sa position verticale
                   left: 0, // Elle commence au bord gauche de la Stack
                   right: 0, // Elle s'étire jusqu'au bord droit de la Stack
                   child: Container(

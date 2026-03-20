@@ -3,14 +3,35 @@ import 'package:ti_asistan/sreens/Accueil.dart';
 import 'package:ti_asistan/sreens/calendrier_screen.dart';
 import 'package:ti_asistan/sreens/projet_screen.dart';
 import 'package:ti_asistan/sreens/taches_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:ti_asistan/service/apiService.dart';
+import 'package:ti_asistan/variables.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState(); // Maintenant cela fonctionnera
+    
+    // On attend que le premier frame soit dessiné pour avoir un contexte valide
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final apiService = Apiservice(); // Assurez-vous que la classe s'appelle Apiservice ou ApiService
+      apiService.initSignalR(context);
+      apiService.startConnection();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Ti Asistan',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

@@ -14,7 +14,7 @@ class _InfoState extends State<Info> {
   @override
   Widget build(BuildContext context) {
   
-  final speechProvider = Provider.of<Speechprovider>(context, listen: false);
+  final speechProvider = Provider.of<Speechprovider>(context);
     return Container(
       width: MediaQuery.of(context).size.width * 0.40,
       height: MediaQuery.of(context).size.height * 0.25,

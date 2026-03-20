@@ -1,17 +1,49 @@
 import 'package:signalr_netcore/signalr_client.dart';
+import 'package:flutter/material.dart';
+import 'package:ti_asistan/variables.dart';
 import 'package:http/http.dart' as http;
 
 class Apiservice {
   late HubConnection hub;
 
-  final String baseUrl = "https://tiassistant.api";
+  final String baseUrl = "https://uncharmable-excursively-colette.ngrok-free.dev/assistantHub";
+  void showPopup(String message) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 5),
+      behavior: SnackBarBehavior.floating, // Flotte au-dessus du contenu
+      margin: EdgeInsets.only(top: 10, left: 50, right: 50), // Pour le mettre en haut
+    action: SnackBarAction(
+      label: 'Voir',
+      onPressed: () => navigatorKey.currentState?.pushReplacementNamed('/calendrier'),
+    ),
+  );
 
-  void initSignalR() {
+  // On utilise le context global de la clé de navigation
+  ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackBar);
+}
+
+  void initSignalR( BuildContext context) {
     hub = HubConnectionBuilder().withUrl(baseUrl).build();
-    hub.on("RecevoirCalendrier", (reponse) {});
-    hub.on("RecevoirEvenements", (reponse) {});
-    hub.on("RecevoirProjet", (reponse) {});
-    hub.on("RecevoirTache", (reponse) {});
+
+    hub.on("Calendrier", (reponse) {
+      print("Calendriers reçus : $reponse");
+      navigatorKey.currentState!.pushReplacementNamed('/calendrier', arguments: reponse);
+      showPopup("Vous avez des événements à venir !");
+      
+    });
+    hub.on("RecevoirEvenements", (reponse) {
+      print("Événements reçus : $reponse");
+    });
+    hub.on("RecevoirProjet", (reponse) {
+      print("Projets reçus : $reponse");
+    });
+    hub.on("RecevoirTache", (reponse) {
+      print("Tâches reçues : $reponse");
+    });
+    hub.on("AssistantNotification", (reponse) {
+      print ("Notification du serveur : $reponse");
+    });
     hub.onclose(({error}) => print("Connexion perdue : $error"));
   }
 
@@ -31,15 +63,15 @@ class Apiservice {
   Future<void> startConnection() async {
     try {
       await hub.start();
-      // print("Connexion SignalR établie !");
+       print("Connexion SignalR établie !");
     } catch (e) {
-      // print("Erreur de connexion : $e");
+       print("Erreur de connexion : $e");
     }
   }
 
   Future<void> recevoirCalendriers() async {
     if (hub.state == HubConnectionState.Connected) {
-      await hub.invoke("sendCalendriers");
+      await hub.invoke("Calendriers");
     } else {
       // Demander de se connecter
     }

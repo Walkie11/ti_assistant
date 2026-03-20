@@ -5,14 +5,17 @@ class Speechprovider with ChangeNotifier {
   String text = "Appuyez pour parler122";
   String get transcription => text;
   SpeechToText speech = SpeechToText();
-
+  bool _isListening = false;
+  bool get isListening => _isListening;
   void changerTexte(String nouveauTexte) {
     text = nouveauTexte;
     notifyListeners();
   }
 
   void startListening() async {
-    changerTexte("yessss");
+    _isListening = true;
+    changerTexte("En ecoute");
+    await speech.initialize();
     await speech.listen(
       onResult: (result) {
         changerTexte(result.recognizedWords);
@@ -21,6 +24,9 @@ class Speechprovider with ChangeNotifier {
   }
 
   void stopListening() async {
+    changerTexte("");
+
+    _isListening = false;
     await speech.stop();
   }
 }
