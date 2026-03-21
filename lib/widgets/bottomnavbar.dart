@@ -12,13 +12,15 @@ class Bottomnavbar extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceAround, // espace entre les icônes
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           IconButton(
             onPressed: () {
-              Navigator.push(context, 
-                MaterialPageRoute(builder: (context)=> const Calendrier())
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalendrierScreen(),
+                ),
               );
             },
             icon: const Icon(Icons.event),

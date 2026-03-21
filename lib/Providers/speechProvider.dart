@@ -14,12 +14,14 @@ class Speechprovider with ChangeNotifier {
 
   void startListening() async {
     _isListening = true;
-    changerTexte("En ecoute");
     await speech.initialize();
+
+    notifyListeners();
     await speech.listen(
       onResult: (result) {
         changerTexte(result.recognizedWords);
       },
+      localeId: "fr_FR",
     );
   }
 
@@ -27,6 +29,7 @@ class Speechprovider with ChangeNotifier {
     changerTexte("");
 
     _isListening = false;
+    notifyListeners();
     await speech.stop();
   }
 }

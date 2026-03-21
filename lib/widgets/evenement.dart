@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+import 'package:ti_asistan/Providers/CalendrierProvider.dart'; 
 
-class Evenement {
-  final String nom;
-  final String description;
-  final DateTime debut;
-  final DateTime fin;
-  final Color couleur = Colors.lightBlueAccent;
-  final bool estARappeler=false;
 
-  Evenement(this.nom, this.description, this.debut, this.fin);
-}
 
 class EvenementWidget extends StatelessWidget {
   const EvenementWidget({super.key, required this.evenement});

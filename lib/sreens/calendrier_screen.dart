@@ -1,24 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:ti_asistan/Providers/CalendrierProvider.dart';
 import 'package:ti_asistan/widgets/evenement.dart';
+import 'package:ti_asistan/widgets/micro.dart';
 
-class CalendrierI {
-  final String id;
-  final String nom;
-  late bool estActive;
-  late List<Evenement> evenements;
-  CalendrierI(this.id, this.nom, this.estActive);
-}
-
-class Calendrier extends StatefulWidget {
-  const Calendrier({super.key});
+class CalendrierScreen extends StatefulWidget {
+  const CalendrierScreen({super.key});
 
   @override
-  State<Calendrier> createState() => _CalendrierState();
+  State<CalendrierScreen> createState() => _CalendrierScreenState();
 }
 
-class _CalendrierState extends State<Calendrier> {
+class _CalendrierScreenState extends State<CalendrierScreen> {
   // 1. Déclare tes variables ICI (au niveau de la classe)
   late List<DateTime> datesJrs;
   final List<String> jours = [];
@@ -53,48 +48,12 @@ class _CalendrierState extends State<Calendrier> {
 
   @override
   Widget build(BuildContext context) {
-    // 3. Le build ne s'occupe QUE du dessin
+    final provCalendrier = Provider.of<Calendrierprovider>(context);
+    print(provCalendrier.calendriers.length);
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     final double itemWidth = screenWidth * 0.35;
-    final List<CalendrierI> mesCalendriers = [
-      CalendrierI('1', 'Professionnel', true),
-      CalendrierI('2', 'Personnel', true),
-      CalendrierI('3', 'Loisirs', true),
-    ];
-    final List<Evenement> evenements = [
-      Evenement(
-        "Concert",
-        "LoremIpsum",
-        DateTime.now().add(const Duration(days: 0)),
-        DateTime.now().add(const Duration(days: 0, hours: 5)),
-      ),
-      Evenement(
-        "Concert",
-        "LoremIpsum",
-        DateTime.now().add(const Duration(days: 1, hours: 18)),
-        DateTime.now().add(const Duration(days: 2)),
-      ),
-      Evenement(
-        "Concert",
-        "LoremIpsum",
-        DateTime.now().add(const Duration(days: 1)),
-        DateTime.now().add(const Duration(days: 1, hours: 5)),
-      ),
-      Evenement(
-        "Concert",
-        "LoremIpsum",
-        DateTime.now().add(const Duration(days: 1)),
-        DateTime.now().add(const Duration(days: 1, hours: 5)),
-      ),
-      Evenement(
-        "Concert",
-        "LoremIpsum",
-        DateTime.now().add(const Duration(days: 1)),
-        DateTime.now().add(const Duration(days: 1, hours: 5)),
-      ),
-    ];
 
-    // Le calendrier actuellement coché
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -102,20 +61,19 @@ class _CalendrierState extends State<Calendrier> {
           icon: const Icon(Icons.arrow_back),
         ),
         actions: [
-          PopupMenuButton<CalendrierI>(
-            icon: const Icon(Icons.filter_list), // Icône du menu
-            onSelected: (CalendrierI cal) {
-              cal.estActive = !cal.estActive;
+          PopupMenuButton<Calendrier>(
+            icon: const Icon(Icons.filter_list),
+            onSelected: (Calendrier cal) {
+              provCalendrier.filtrerCalendrier(cal.nom);
             },
             itemBuilder: (BuildContext context) {
-              // On transforme la liste d'objets en liste de widgets de menu
-              return mesCalendriers.map((CalendrierI cal) {
-                return CheckedPopupMenuItem<CalendrierI>(
+              return provCalendrier.calendriers.map((cal) {
+                return CheckedPopupMenuItem<Calendrier>(
                   value: cal,
-                  checked: cal.estActive, // Vérification par ID
+                  checked: cal.estActive,
                   child: Text(cal.nom),
                 );
-              }).toList(); // Très important de convertir l'Iterable en List
+              }).toList();
             },
           ),
         ],
@@ -136,68 +94,19 @@ class _CalendrierState extends State<Calendrier> {
         ),
         elevation: 0,
       ),
-      floatingActionButton: FloatingActionButton.large(
-        onPressed: () {},
+      floatingActionButton: Micro(),
 
-        backgroundColor: const Color.fromARGB(255, 163, 75, 16),
-        elevation: 0,
-        highlightElevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-          side: BorderSide(color: Colors.white, width: 2),
-        ),
-        child: Icon(Icons.mic, color: Colors.white),
-      ),
-      drawerDragStartBehavior: DragStartBehavior.start,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets
-              .zero, // Important pour que le header remplisse tout le haut
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blueAccent),
-              child: Text(
-                'Menu Principal',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Accueil'),
-              onTap: () {
-                Navigator.pop(context); // Ferme le drawer
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.calendar_month),
-              title: const Text('Calendrier'),
-              onTap: () {
-                Navigator.pop(context); // Ferme le drawer
-                Navigator.pushNamed(context, '/calendrier');
-              },
-            ),
-            const Divider(), // Une ligne de séparation
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Paramètres'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
       body: Row(
         children: [
           Container(
-            width: MediaQuery.of(context).size.width * 0.1,
+            width: screenWidth * 0.1,
             child: Column(
               children: [
-                SizedBox(height: 60),
+                SizedBox(height: screenHeight *0.06),
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.1,
-                  height: MediaQuery.of(context).size.height * 0.884,
-                  color: const Color.fromARGB(134, 85, 9, 9),
+                  width: screenWidth * 0.1,
+                  height: screenHeight * 0.88,
+                  color: const Color.fromARGB(133, 44, 44, 44),
                 ),
               ],
             ),
@@ -237,12 +146,10 @@ class _CalendrierState extends State<Calendrier> {
                           height: hauteurTotaleZone,
                           color: const Color.fromARGB(255, 43, 43, 40),
                           child: Stack(
-                            children: evenements
+                            children: provCalendrier.evenements
                                 .where((event) {
-                                  return event.debut.day ==
-                                          jourDeLaColonne.day &&
-                                      event.debut.month ==
-                                          jourDeLaColonne.month &&
+                                  return event.debut.day ==jourDeLaColonne.day &&
+                                      event.debut.month ==jourDeLaColonne.month &&
                                       event.debut.year == jourDeLaColonne.year;
                                 })
                                 .map((event) {
