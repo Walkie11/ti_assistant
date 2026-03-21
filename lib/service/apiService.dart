@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:flutter/material.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/objet/calendrier.dart';
 import 'package:ti_asistan/variables.dart';
 import 'package:http/http.dart' as http;
 
@@ -39,21 +40,14 @@ class Apiservice {
     hub.on("Calendrier", (reponse) {
      if (reponse != null && reponse.isNotEmpty) {
         final Map<String, dynamic> reponseComplete =reponse[0] as Map<String, dynamic>;
-
-        // 2. On accède à la propriété 'data' (qui contient tes calendriers)
         final List<dynamic>? dataBrute = reponseComplete['data'];
-
-        // Ensuite tu fais ton mapping comme prévu :
-        final cals = dataBrute!.map((item) => Calendrier.fromJson(item))
-            .toList();
+        final cals = dataBrute!.map((item) => Calendrier.fromJson(item)).toList();
         calendrierProvider.chargerCalendriers(cals);
       }
       navigatorKey.currentState!.pushReplacementNamed('/calendrier');
       showPopup("Vous avez des événements à venir !");
     });
-    hub.on("RecevoirEvenements", (reponse) {
-      print("Événements reçus : $reponse");
-    });
+   
     hub.on("RecevoirProjet", (reponse) {
       print("Projets reçus : $reponse");
     });

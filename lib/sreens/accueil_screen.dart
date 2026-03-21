@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/service/apiService.dart';
 import 'package:ti_asistan/Providers/speechProvider.dart';
 import 'package:ti_asistan/utiltaires/fablocation.dart';
@@ -10,21 +12,6 @@ import 'package:ti_asistan/widgets/info.dart';
 import 'package:ti_asistan/widgets/productivite.dart';
 import 'package:ti_asistan/widgets/taches.dart';
 
-class Evenements {
-  String nom = "";
-  String? projet = "";
-  String? calendrier = "";
-  DateTime start = DateTime(0);
-  DateTime end = DateTime(0);
-
-  Evenements({
-    required this.nom,
-    required this.projet,
-    required this.start,
-    required this.end,
-  });
-}
-
 class AccueilScreen extends StatefulWidget {
   const AccueilScreen({super.key});
   @override
@@ -33,21 +20,19 @@ class AccueilScreen extends StatefulWidget {
 
 class _AccueilScreenState extends State<AccueilScreen> {
   final service = Apiservice();
-  
-  List<Evenements> events = List.generate(
-    8,
-    (index) => Evenements(
-      nom: "Epreuve Synthese",
-      projet: "Ti Asistan",
-      start: DateTime.now(),
-      end: DateTime.now().add(Duration(days: 30)),
-    ),
-  );
+
   @override
   Widget build(BuildContext context) {
+    var prov = Provider.of<Calendrierprovider>(context);
+    final maintenant = DateTime.now();
+
+    List<Evenement> events = prov.evenements.where((event) {
+      return event.debut.day == maintenant.day &&
+          event.debut.month == maintenant.month &&
+          event.debut.year == maintenant.year;
+    }).toList();
 
     return Scaffold(
-     
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -55,19 +40,12 @@ class _AccueilScreenState extends State<AccueilScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Column(
-                children: [
-                  Info(),
-                  SizedBox(height: 10),
-                  Productivite(),
-                ],
-              ),
+              Column(children: [Info(), SizedBox(height: 10), Productivite()]),
               SizedBox(width: 10),
-
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Eventjour(evenements: events.take(4).toList()),
+                  Eventjour(),
 
                   if (events.length > 5)
                     Positioned(
@@ -78,7 +56,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
                         height: 45,
                         width: 45,
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: const Color.fromARGB(255, 209, 52, 46),
                           shape: BoxShape.circle,
                         ),
                         child: Text(
@@ -95,14 +73,10 @@ class _AccueilScreenState extends State<AccueilScreen> {
               ),
             ],
           ),
-
-          SizedBox(height: 10),
           SizedBox(height: 10),
           Taches(),
         ],
       ),
-      
-      
     );
   }
 }

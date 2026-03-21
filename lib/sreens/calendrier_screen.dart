@@ -1,8 +1,12 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/objet/calendrier.dart';
+import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/widgets/evenement.dart';
 import 'package:ti_asistan/widgets/micro.dart';
 
@@ -49,7 +53,6 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
   @override
   Widget build(BuildContext context) {
     final provCalendrier = Provider.of<Calendrierprovider>(context);
-    print(provCalendrier.calendriers.length);
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double itemWidth = screenWidth * 0.35;
@@ -102,7 +105,7 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
             width: screenWidth * 0.1,
             child: Column(
               children: [
-                SizedBox(height: screenHeight *0.06),
+                SizedBox(height: screenHeight * 0.06),
                 Container(
                   width: screenWidth * 0.1,
                   height: screenHeight * 0.88,
@@ -148,20 +151,58 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
                           child: Stack(
                             children: provCalendrier.evenements
                                 .where((event) {
-                                  return event.debut.day ==jourDeLaColonne.day &&
-                                      event.debut.month ==jourDeLaColonne.month &&
-                                      event.debut.year == jourDeLaColonne.year;
+                                  final debutDuJour = DateTime(
+                                    jourDeLaColonne.year,
+                                    jourDeLaColonne.month,
+                                    jourDeLaColonne.day,
+                                  );
+                                  final finDuJour = debutDuJour.add(
+                                    const Duration(
+                                      hours: 23,
+                                      minutes: 59,
+                                      seconds: 59,
+                                    ),
+                                  );
+                                  return !event.fin.isBefore(debutDuJour) &&
+                                      !event.debut.isAfter(finDuJour);
                                 })
                                 .map((event) {
+                                  double heureDebutRelative = 0.0;
+                                  if (event.debut.year ==
+                                          jourDeLaColonne.year &&
+                                      event.debut.month ==
+                                          jourDeLaColonne.month &&
+                                      event.debut.day == jourDeLaColonne.day) {
+                                    heureDebutRelative =
+                                        event.debut.hour +
+                                        (event.debut.minute / 60.0);
+                                  }
+                                  double heureFinRelative = 24.0;
+
+                                  // Si l'événement finit aujourd'hui, on prend son heure de fin réelle
+                                  if (event.fin.year == jourDeLaColonne.year &&
+                                      event.fin.month ==
+                                          jourDeLaColonne.month &&
+                                      event.fin.day == jourDeLaColonne.day) {
+                                    heureFinRelative =
+                                        event.fin.hour +
+                                        (event.fin.minute / 60.0);
+                                  }
+                                  // Sinon, il finit un jour suivant, donc il occupe toute la colonne jusqu'à 24:00.
+
                                   final double topPosition =
-                                      (event.debut.hour +
-                                          (event.debut.minute / 60)) *
-                                      hauteurHeure;
+                                      heureDebutRelative * hauteurHeure;
+                                  final double dureeAffichee =
+                                      heureFinRelative - heureDebutRelative;
+                                  final double hauteurTotale =
+                                      dureeAffichee * hauteurHeure;
 
                                   return Positioned(
                                     top: topPosition,
                                     left: 0,
                                     right: 0,
+                                    height:
+                                        hauteurTotale, // On définit la hauteur exacte pour ce jour
                                     child: EvenementWidget(evenement: event),
                                   );
                                 })
