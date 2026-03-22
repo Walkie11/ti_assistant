@@ -22,9 +22,9 @@ class _MicroState extends State<Micro> with SingleTickerProviderStateMixin {
       duration: const Duration(milliseconds: 1500),
     );
     _animation = TweenSequence(<TweenSequenceItem<double>>[
-      TweenSequenceItem(tween: Tween(begin: 1.0), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0),weight: 20,), 
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.1),weight: 10,), 
+      TweenSequenceItem(tween: Tween(begin: 1.0,end: 1.2), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.1), weight: 10),
       TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 30),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
@@ -42,11 +42,11 @@ class _MicroState extends State<Micro> with SingleTickerProviderStateMixin {
     bool isListening = speechProvider.isListening;
     return ScaleTransition(
       scale: _animation,
-    
+
       child: GestureDetector(
-        onTap: () => HapticFeedback.heavyImpact(),
         onLongPress: () {
           speechProvider.startListening();
+          HapticFeedback.heavyImpact();
         },
         onLongPressUp: () {
           speechProvider.stopListening();
@@ -63,15 +63,16 @@ class _MicroState extends State<Micro> with SingleTickerProviderStateMixin {
             elevation: isListening ? 0 : 8,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(55),
-              side: BorderSide(color: Colors.white, width: 2 ),
+              side: BorderSide(color: Colors.white, width: 2),
             ),
             child: Icon(
-              isListening? Icons.graphic_eq :Icons.mic, color: Colors.white, size: 40),
+              isListening ? Icons.graphic_eq : Icons.mic,
+              color: Colors.white,
+              size: 40,
+            ),
           ),
         ),
-      )
+      ),
     );
-    
-    
   }
 }

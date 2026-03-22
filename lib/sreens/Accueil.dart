@@ -16,8 +16,7 @@ class _AccueilState extends State<Accueil> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        elevation: 100,
         
       ),
       floatingActionButton: Micro(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/Providers/authProvider.dart';
 import 'package:ti_asistan/app/app.dart';
 import 'package:provider/provider.dart';
 import 'package:ti_asistan/Providers/speechProvider.dart';
@@ -14,6 +15,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => Speechprovider()),
         ChangeNotifierProvider(create: (context) => Calendrierprovider()),
+        ChangeNotifierProvider(create: (context) => Authprovider()),
       ],
       child: const MyApp(),
     ),

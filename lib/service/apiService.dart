@@ -36,18 +36,24 @@ class Apiservice {
 
   void initSignalR(BuildContext context) {
     hub = HubConnectionBuilder().withUrl(baseUrl).build();
-    final calendrierProvider = Provider.of<Calendrierprovider>(context);
+    final calendrierProvider = Provider.of<Calendrierprovider>(
+      context,
+      listen: false,
+    );
     hub.on("Calendrier", (reponse) {
-     if (reponse != null && reponse.isNotEmpty) {
-        final Map<String, dynamic> reponseComplete =reponse[0] as Map<String, dynamic>;
+      if (reponse != null && reponse.isNotEmpty) {
+        final Map<String, dynamic> reponseComplete =
+            reponse[0] as Map<String, dynamic>;
         final List<dynamic>? dataBrute = reponseComplete['data'];
-        final cals = dataBrute!.map((item) => Calendrier.fromJson(item)).toList();
+        final cals = dataBrute!
+            .map((item) => Calendrier.fromJson(item))
+            .toList();
         calendrierProvider.chargerCalendriers(cals);
       }
       navigatorKey.currentState!.pushReplacementNamed('/calendrier');
       showPopup("Vous avez des événements à venir !");
     });
-   
+
     hub.on("RecevoirProjet", (reponse) {
       print("Projets reçus : $reponse");
     });
@@ -65,6 +71,17 @@ class Apiservice {
       final url = Uri.parse(baseUrl);
 
       final reponse = await http.post(url);
+      if (reponse.statusCode != 200) {}
+    } catch (e) {
+      print("Erreur: " + e.toString());
+    }
+  }
+
+  Future<void> Connecter(String userName, String password) async {
+    try {
+      final url = Uri.parse(baseUrl);
+
+      final reponse = await http.post(url, body: jsonEncode({"Nom": userName,"Password":password}));
       if (reponse.statusCode != 200) {}
     } catch (e) {
       print("Erreur: " + e.toString());

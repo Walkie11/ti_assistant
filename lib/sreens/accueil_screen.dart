@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
 import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/service/apiService.dart';
-import 'package:ti_asistan/Providers/speechProvider.dart';
-import 'package:ti_asistan/utiltaires/fablocation.dart';
-import 'package:ti_asistan/widgets/bottomnavbar.dart';
 import 'package:ti_asistan/widgets/eventjour.dart';
 import 'package:ti_asistan/widgets/info.dart';
 import 'package:ti_asistan/widgets/productivite.dart';
@@ -75,6 +71,8 @@ class _AccueilScreenState extends State<AccueilScreen> {
           ),
           SizedBox(height: 10),
           Taches(),
+          SizedBox(height: 10),
+
         ],
       ),
     );

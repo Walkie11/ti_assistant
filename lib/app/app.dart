@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/Providers/authProvider.dart';
 import 'package:ti_asistan/sreens/Accueil.dart';
 import 'package:ti_asistan/sreens/calendrier_screen.dart';
+import 'package:ti_asistan/sreens/connexionScreen.dart';
 import 'package:ti_asistan/sreens/projet_screen.dart';
 import 'package:ti_asistan/sreens/taches_screen.dart';
 import 'package:ti_asistan/service/apiService.dart';
@@ -30,6 +33,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var isConnected = false;
+    var api = Apiservice();
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Ti Asistan',
@@ -45,13 +50,27 @@ class _MyAppState extends State<MyApp> {
           elevation: 10,
         ),
       ),
-      initialRoute: '/',
+      initialRoute:isConnected ? '/':'/connexion',
       routes: {
-        '/': (context) => Accueil(),
+        '/':(context)=> RacinePage(),
+        '/accueil': (context) => Accueil(),
         '/calendrier': (context) => CalendrierScreen(),
         '/tache': (context) => TachesScreen(),
         '/projet': (context) => ProjetScreen(),
       },
     );
+  }
+}
+class RacinePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // On écoute le Provider d'authentification
+    final authProv = context.watch<Authprovider>();
+
+    if (authProv.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return authProv.isConnected ? const Accueil() : const Connexionscreen();
   }
 }
