@@ -33,9 +33,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    var isConnected = false;
-    var api = Apiservice();
+  
     return MaterialApp(
+
       navigatorKey: navigatorKey,
       title: 'Ti Asistan',
       debugShowCheckedModeBanner: false,
@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
           elevation: 10,
         ),
       ),
-      initialRoute:isConnected ? '/':'/connexion',
+      initialRoute:'/',
       routes: {
         '/':(context)=> RacinePage(),
         '/accueil': (context) => Accueil(),
@@ -64,13 +64,11 @@ class _MyAppState extends State<MyApp> {
 class RacinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // On écoute le Provider d'authentification
     final authProv = context.watch<Authprovider>();
 
     if (authProv.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     return authProv.isConnected ? const Accueil() : const Connexionscreen();
   }
 }

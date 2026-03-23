@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:http/http.dart' as http;
 
 class Apiservice {
   late HubConnection hub;
+  var secured = FlutterSecureStorage();
 
   final String baseUrl =
       "https://uncharmable-excursively-colette.ngrok-free.dev/assistantHub";
@@ -69,22 +71,61 @@ class Apiservice {
   Future<void> envoyerIntention(String text) async {
     try {
       final url = Uri.parse(baseUrl);
-
-      final reponse = await http.post(url);
+      var token = await secured.read(key: 'token');
+      final reponse = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "token": "${token}",
+        },
+      );
       if (reponse.statusCode != 200) {}
     } catch (e) {
       print("Erreur: " + e.toString());
     }
   }
 
-  Future<void> Connecter(String userName, String password) async {
+  Future<http.Response?> Connecter(String userName, String password) async {
     try {
       final url = Uri.parse(baseUrl);
 
-      final reponse = await http.post(url, body: jsonEncode({"Nom": userName,"Password":password}));
-      if (reponse.statusCode != 200) {}
+      final reponse = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        }, // Often required for jsonEncode
+        body: jsonEncode({"Nom": userName, "Password": password}),
+      );
+
+      return reponse;
     } catch (e) {
       print("Erreur: " + e.toString());
+      return null;
+    }
+  }
+
+  Future<http.Response?> Inscrire(
+    String userName,
+    String email,
+    String password,
+  ) async {
+    try {
+      final url = Uri.parse(baseUrl);
+
+      final reponse = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "nom": userName,
+          "email": email,
+          "password": password,
+        }),
+      );
+
+      return reponse;
+    } catch (e) {
+      print("Erreur: " + e.toString());
+      return null;
     }
   }
 
