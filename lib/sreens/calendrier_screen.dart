@@ -1,12 +1,9 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/Providers/evenementProv.dart';
 import 'package:ti_asistan/objet/calendrier.dart';
-import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/widgets/evenement.dart';
 import 'package:ti_asistan/widgets/micro.dart';
 
@@ -18,44 +15,51 @@ class CalendrierScreen extends StatefulWidget {
 }
 
 class _CalendrierScreenState extends State<CalendrierScreen> {
-  // 1. Déclare tes variables ICI (au niveau de la classe)
-  late List<DateTime> datesJrs;
-  final List<String> jours = [];
-  late String mois;
+  // On initialise 'present' à aujourd'hui (00:00:00) pour faciliter les comparaisons
+  DateTime present = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
 
-  @override
-  void initState() {
-    super.initState();
-    // 2. Initialise tes données une seule fois
-    datesJrs = List.generate(
-      7,
-      (index) => DateTime.now().add(Duration(days: index)),
-    );
+  void passer(int num) {
+    // ✅ Correction : setState est indispensable pour rafraîchir l'UI
+    setState(() {
+      present = present.add(Duration(days: num));
+    });
+  }
 
-    for (int i = 0; i < 7; i++) {
-      String jourDebut = DateFormat('d MMM', 'fr_FR').format(datesJrs.first);
-      jourDebut = jourDebut[0].toUpperCase() + jourDebut.substring(1);
-
-      String moisFin = DateFormat('d MMM', 'fr_FR').format(datesJrs.last);
-      moisFin = moisFin[0].toUpperCase() + moisFin.substring(1);
-
-      if (jourDebut != moisFin) {
-        mois = "$jourDebut - $moisFin";
-      } else {
-        mois = jourDebut;
-      }
-      String formatte = DateFormat('EEEE d', 'fr_FR').format(datesJrs[i]);
-
-      jours.add(formatte[0].toUpperCase() + formatte.substring(1));
-    }
+  // Fonction utilitaire pour vérifier si deux dates sont le même jour
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   @override
   Widget build(BuildContext context) {
+    final provEvent = Provider.of<EvenementProv>(context);
     final provCalendrier = Provider.of<Calendrierprovider>(context);
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+
+    // On définit des dimensions plus stables
     final double itemWidth = screenWidth * 0.35;
+    final double hauteurTotaleZone = screenHeight * 0.85;
+    final double hauteurHeure = hauteurTotaleZone / 24;
+
+    // Calcul du premier jour de la semaine (Lundi)
+    var premierJour = present.subtract(Duration(days: present.weekday - 1));
+
+    // Génération des 7 jours de la semaine affichée
+    List<DateTime> datesJrs = List.generate(
+      7,
+      (index) => premierJour.add(Duration(days: index)),
+    );
+
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,58 +67,80 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
         ),
-        actions: [
-          PopupMenuButton<Calendrier>(
-            icon: const Icon(Icons.filter_list),
-            onSelected: (Calendrier cal) {
-              provCalendrier.filtrerCalendrier(cal.nom);
-            },
-            itemBuilder: (BuildContext context) {
-              return provCalendrier.calendriers.map((cal) {
-                return CheckedPopupMenuItem<Calendrier>(
-                  value: cal,
-                  checked: cal.estActive,
-                  child: Text(cal.nom),
-                );
-              }).toList();
-            },
-          ),
-        ],
-        title: Center(
+        actions: (args != null || provCalendrier.calendriers.isEmpty)
+            ? []
+            : [
+                PopupMenuButton<Calendrier>(
+                  icon: const Icon(Icons.filter_list),
+                  onSelected: (Calendrier cal) =>
+                      provCalendrier.filtrerCalendrier(cal.nom),
+                  itemBuilder: (context) =>
+                      provCalendrier.calendriers.map((cal) {
+                        return CheckedPopupMenuItem<Calendrier>(
+                          value: cal,
+                          checked: cal.estActive,
+                          child: Text(cal.nom),
+                        );
+                      }).toList(),
+                ),
+              ],
+        title: FittedBox(
+          // ✅ Empêche le titre de déborder sur mobile
+          fit: BoxFit.scaleDown,
           child: Row(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.arrow_back_ios_new_rounded),
+                onPressed: () => passer(-7),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded),
               ),
-              Text(mois),
+              const Text("Semaine du "),
+              Text(DateFormat('d MMM', 'fr_FR').format(premierJour)),
+              const Text(" - "),
+              Text(
+                DateFormat(
+                  'd MMM',
+                  'fr_FR',
+                ).format(premierJour.add(const Duration(days: 6))),
+              ),
               IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.arrow_forward_ios_outlined),
+                onPressed: () => passer(7),
+                icon: const Icon(Icons.arrow_forward_ios_outlined),
               ),
             ],
           ),
         ),
         elevation: 0,
       ),
-      floatingActionButton: Micro(),
-
+      floatingActionButton: const Micro(),
       body: Row(
         children: [
-          Container(
-            width: screenWidth * 0.1,
+          // Colonne des heures à gauche
+          SizedBox(
+            width: screenWidth * 0.12,
             child: Column(
               children: [
-                SizedBox(height: screenHeight * 0.06),
-                Container(
-                  width: screenWidth * 0.1,
-                  height: screenHeight * 0.88,
-                  color: const Color.fromARGB(133, 44, 44, 44),
+                const SizedBox(height: 50), // Aligné avec l'en-tête
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: 24,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, i) => SizedBox(
+                      height: hauteurHeure,
+                      child: Center(
+                        child: Text(
+                          "$i:00",
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          SizedBox(width: 5),
 
           Expanded(
             child: Stack(
@@ -122,13 +148,11 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
                 ListView.separated(
                   scrollDirection: Axis.horizontal,
                   separatorBuilder: (context, index) =>
-                      const SizedBox(width: 2),
+                      const VerticalDivider(width: 2, color: Colors.black12),
                   itemCount: 7,
                   itemBuilder: (context, dayIndex) {
-                    final DateTime jourDeLaColonne = datesJrs[dayIndex];
-                    final double hauteurTotaleZone =
-                        MediaQuery.of(context).size.height * 0.883;
-                    final double hauteurHeure = hauteurTotaleZone / 24;
+                    final DateTime jour = datesJrs[dayIndex];
+                    final bool estAujourdhui = isSameDay(jour, DateTime.now());
 
                     return Column(
                       children: [
@@ -136,94 +160,77 @@ class _CalendrierScreenState extends State<CalendrierScreen> {
                           alignment: Alignment.center,
                           width: itemWidth,
                           height: 50,
-                          color: const Color.fromARGB(255, 43, 43, 40),
+                          color: estAujourdhui
+                              ? const Color.fromARGB(
+                                  255,
+                                  161,
+                                  138,
+                                  3,
+                                ).withValues(alpha: 0.6)
+                              : const Color.fromARGB(255, 48, 47, 47),
                           child: Text(
-                            jours[dayIndex],
-                            style: const TextStyle(color: Colors.white),
+                            DateFormat(
+                              'E d',
+                              'fr_FR',
+                            ).format(jour).toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: estAujourdhui
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 5,),
+                        Expanded(
+                          child: Container(
+                            width: itemWidth,
+                            color: const Color.fromARGB(255, 43, 43, 40),
+                            child: Stack(
+                              children: provEvent.objets
+                                  .where((event) {
+                                    return isSameDay(event.debut, jour) ||
+                                        isSameDay(event.fin, jour);
+                                  })
+                                  .map((event) {
+                                    double start = event.debut.day == jour.day
+                                        ? event.debut.hour +
+                                              (event.debut.minute / 60.0)
+                                        : 0.0;
+                                    double end = event.fin.day == jour.day
+                                        ? event.fin.hour +
+                                              (event.fin.minute / 60.0)
+                                        : 24.0;
 
-                        Container(
-                          width: itemWidth,
-                          height: hauteurTotaleZone,
-                          color: const Color.fromARGB(255, 43, 43, 40),
-                          child: Stack(
-                            children: provCalendrier.evenements
-                                .where((event) {
-                                  final debutDuJour = DateTime(
-                                    jourDeLaColonne.year,
-                                    jourDeLaColonne.month,
-                                    jourDeLaColonne.day,
-                                  );
-                                  final finDuJour = debutDuJour.add(
-                                    const Duration(
-                                      hours: 23,
-                                      minutes: 59,
-                                      seconds: 59,
-                                    ),
-                                  );
-                                  return !event.fin.isBefore(debutDuJour) &&
-                                      !event.debut.isAfter(finDuJour);
-                                })
-                                .map((event) {
-                                  double heureDebutRelative = 0.0;
-                                  if (event.debut.year ==
-                                          jourDeLaColonne.year &&
-                                      event.debut.month ==
-                                          jourDeLaColonne.month &&
-                                      event.debut.day == jourDeLaColonne.day) {
-                                    heureDebutRelative =
-                                        event.debut.hour +
-                                        (event.debut.minute / 60.0);
-                                  }
-                                  double heureFinRelative = 24.0;
-
-                                  // Si l'événement finit aujourd'hui, on prend son heure de fin réelle
-                                  if (event.fin.year == jourDeLaColonne.year &&
-                                      event.fin.month ==
-                                          jourDeLaColonne.month &&
-                                      event.fin.day == jourDeLaColonne.day) {
-                                    heureFinRelative =
-                                        event.fin.hour +
-                                        (event.fin.minute / 60.0);
-                                  }
-                                  // Sinon, il finit un jour suivant, donc il occupe toute la colonne jusqu'à 24:00.
-
-                                  final double topPosition =
-                                      heureDebutRelative * hauteurHeure;
-                                  final double dureeAffichee =
-                                      heureFinRelative - heureDebutRelative;
-                                  final double hauteurTotale =
-                                      dureeAffichee * hauteurHeure;
-
-                                  return Positioned(
-                                    top: topPosition,
-                                    left: 0,
-                                    right: 0,
-                                    height:
-                                        hauteurTotale, // On définit la hauteur exacte pour ce jour
-                                    child: EvenementWidget(evenement: event),
-                                  );
-                                })
-                                .toList(),
+                                    return Positioned(
+                                      top: start * hauteurHeure,
+                                      left: 2,
+                                      right: 2,
+                                      height: (end - start) * hauteurHeure,
+                                      child: EvenementWidget(evenement: event),
+                                    );
+                                  })
+                                  .toList(),
+                            ),
                           ),
                         ),
                       ],
                     );
                   },
                 ),
+
                 Positioned(
                   top:
-                      (MediaQuery.of(context).size.height * 0.883) /
-                          24 *
-                          (DateTime.now().hour + DateTime.now().minute / 60) +
-                      55, // Sa position verticale
-                  left: 0, // Elle commence au bord gauche de la Stack
-                  right: 0, // Elle s'étire jusqu'au bord droit de la Stack
-                  child: Container(
-                    height: 2, // L'épaisseur de ta ligne
-                    color: Colors.amber,
+                      50 +
+                      (hauteurHeure *
+                          (DateTime.now().hour + DateTime.now().minute / 60)),
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 2,
+                      color: Colors.amber.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
               ],

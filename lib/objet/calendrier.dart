@@ -1,6 +1,7 @@
-import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:ti_asistan/objet/evenement.dart';
+  import 'dart:math'; 
 
 class Calendrier {
   final String nom;
@@ -26,4 +27,20 @@ class Calendrier {
       couleur: Color(json['couleur'].replaceFirst('#', '0xff')),
     );
   }
+
+Color getColorFromJson(String? hexString) {
+  if (hexString == null || hexString.isEmpty) {
+    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withValues(alpha: 1.0);
+  }
+
+  try {
+    String formattedHex = hexString.replaceFirst('#', '');
+    if (formattedHex.length == 6) {
+      formattedHex = 'FF$formattedHex';
+    }
+    return Color(int.parse(formattedHex, radix: 16));
+  } catch (e) {
+    return Colors.grey; 
+  }
+}
 }

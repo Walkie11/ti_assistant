@@ -13,10 +13,11 @@ class _ConnexionscreenState extends State<Connexionscreen> {
     bool senregistre = false;
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width*0.1;
     return Scaffold(
       body: Center(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 100),
+          margin: EdgeInsets.symmetric(horizontal: size ),
           
           child: Card(
             color: const Color.fromARGB(255, 192, 177, 154),
@@ -38,14 +39,14 @@ class _ConnexionscreenState extends State<Connexionscreen> {
                           
                         },
                         'Connexion',
-                        !senregistre,
+                        senregistre,
                       ),
                       ongletButton(
                         () {
                           setState(() => senregistre = !senregistre);
                         },
                         'Inscription',
-                        senregistre,
+                        !senregistre,
                       ),
                     ],
                   ),
@@ -54,7 +55,12 @@ class _ConnexionscreenState extends State<Connexionscreen> {
                       const SizedBox(height: 50),
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 100),
-                        child: senregistre? ConnexionForm():InscriptionForm(),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: senregistre 
+                            ? InscriptionForm(key: ValueKey('inscription')) 
+                            : ConnexionForm(key: ValueKey('connexion')),
+                        ),
                       ),
                       const SizedBox(height: 50),
                     ],

@@ -60,7 +60,7 @@ class _ConnexionFormState extends State<ConnexionForm> {
                   _passController.text,
                 );
                 if (_prov.Connected) {
-                  Navigator.popAndPushNamed(context, '/');
+                  Navigator.popAndPushNamed(context, '/accueil');
                 }
               }
             },

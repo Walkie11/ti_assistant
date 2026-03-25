@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:ti_asistan/Providers/CalendrierProvider.dart';
 import 'package:ti_asistan/Providers/authProvider.dart';
@@ -20,12 +21,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    super.initState(); // Maintenant cela fonctionnera
-
-    // On attend que le premier frame soit dessiné pour avoir un contexte valide
+    super.initState(); 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final apiService =
-          Apiservice(); // Assurez-vous que la classe s'appelle Apiservice ou ApiService
+          Apiservice(); 
       apiService.initSignalR(context);
       apiService.startConnection();
     });
@@ -34,7 +33,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
   
-    return MaterialApp(
+    return OverlaySupport.global(child: MaterialApp(
 
       navigatorKey: navigatorKey,
       title: 'Ti Asistan',
@@ -50,25 +49,25 @@ class _MyAppState extends State<MyApp> {
           elevation: 10,
         ),
       ),
-      initialRoute:'/',
+      initialRoute:'/accueil',
       routes: {
-        '/':(context)=> RacinePage(),
+        // '/':(context)=> RacinePage(),
         '/accueil': (context) => Accueil(),
         '/calendrier': (context) => CalendrierScreen(),
         '/tache': (context) => TachesScreen(),
         '/projet': (context) => ProjetScreen(),
       },
-    );
+    ));
   }
 }
 class RacinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final authProv = context.watch<Authprovider>();
 
+    final authProv = context.watch<Authprovider>();
     if (authProv.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    return authProv.isConnected ? const Accueil() : const Connexionscreen();
+    return authProv.Connected ? const Accueil() : const Connexionscreen();
   }
 }

@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ti_asistan/Providers/speechProvider.dart';
+import 'package:intl/intl.dart';
 
 class Info extends StatefulWidget {
   const Info({super.key});
@@ -10,17 +10,31 @@ class Info extends StatefulWidget {
 }
 
 class _InfoState extends State<Info> {
+  late DateTime present = DateTime(0);
+  @override
+  void initState() {
+    super.initState();
+    // Met à jour l'heure chaque seconde automatiquement
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        // Vérifie que le widget est encore affiché
+        setState(() {
+          present = DateTime.now();
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-  
-  final speechProvider = Provider.of<Speechprovider>(context);
+    var width = MediaQuery.of(context).size.width * 0.40;
+    var height = MediaQuery.of(context).size.height * 0.25;
     return Container(
-      width: MediaQuery.of(context).size.width * 0.40,
-      height: MediaQuery.of(context).size.height * 0.25,
+      width: width,
+      height: height,
       margin: EdgeInsets.only(top: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(15),
           topRight: Radius.circular(15),
@@ -35,7 +49,42 @@ class _InfoState extends State<Info> {
           left: BorderSide.none,
         ),
       ),
-      child: Text(speechProvider.text),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+
+          children: [
+            Text(
+              DateFormat('d MMMM', 'fr_FR').format(present),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: width * 0.09,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  DateFormat("HH'h'm").format(present),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: width * 0.2,
+                    color: Colors.blueGrey,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [Text(DateFormat('ss').format(present))],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

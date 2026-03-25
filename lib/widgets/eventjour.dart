@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/Providers/evenementProv.dart';
 import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/widgets/event.dart';
 import 'package:ti_asistan/widgets/liveevent.dart';
@@ -15,15 +15,17 @@ class Eventjour extends StatefulWidget {
 class _EventjourState extends State<Eventjour> {
   @override
   Widget build(BuildContext context) {
-  var prov = Provider.of<Calendrierprovider>(context);
-  final maintenant = DateTime.now();
+    var prov = Provider.of<EvenementProv>(context);
+    final maintenant = DateTime.now();
 
-    List<Evenement> evenements = prov.evenements.where((event) {
+    List<Evenement> evenements = prov.objets.where((event) {
       return event.debut.day == maintenant.day &&
           event.debut.month == maintenant.month &&
           event.debut.year == maintenant.year;
     }).toList();
-    return Container(
+    return  GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/calendrier'),
+      child:  Container(
       width: MediaQuery.of(context).size.width * 0.5,
       height: MediaQuery.of(context).size.height * 0.5,
       margin: EdgeInsets.only(top: 15),
@@ -53,11 +55,11 @@ class _EventjourState extends State<Eventjour> {
 
                     children: [
                       LiveEvent(
-                        projet:evenements[index].nomCalendrier,
-                        titre:evenements[index].nom,
-                        calendrier:evenements[index].nomCalendrier,
-                        start:evenements[index].debut,
-                        end:evenements[index].fin,
+                        projet: evenements[index].nomCalendrier,
+                        titre: evenements[index].nom,
+                        calendrier: evenements[index].nomCalendrier,
+                        start: evenements[index].debut,
+                        end: evenements[index].fin,
                       ),
                       SizedBox(height: 2),
                     ],
@@ -76,6 +78,6 @@ class _EventjourState extends State<Eventjour> {
                 );
               },
             ),
-    );
+    ));
   }
 }

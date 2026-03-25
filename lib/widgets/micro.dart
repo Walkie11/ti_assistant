@@ -45,7 +45,7 @@ class _MicroState extends State<Micro> with SingleTickerProviderStateMixin {
 
       child: GestureDetector(
         onLongPress: () {
-          speechProvider.startListening();
+          speechProvider.startListening(context);
           HapticFeedback.heavyImpact();
         },
         onLongPressUp: () {

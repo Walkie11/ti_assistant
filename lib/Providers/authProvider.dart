@@ -27,6 +27,11 @@ class Authprovider with ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+  void deconnecter() async {
+    await prefs.delete(key: 'token');
+    isConnected = false;
+    notifyListeners();
+  }
 
   Future<void> Connecter(String userName, String password) async {
     this.isLoading = true;

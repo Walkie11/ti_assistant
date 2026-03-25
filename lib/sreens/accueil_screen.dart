@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ti_asistan/Providers/CalendrierProvider.dart';
+import 'package:ti_asistan/Providers/evenementProv.dart';
 import 'package:ti_asistan/objet/evenement.dart';
 import 'package:ti_asistan/service/apiService.dart';
 import 'package:ti_asistan/widgets/eventjour.dart';
@@ -19,10 +19,10 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var prov = Provider.of<Calendrierprovider>(context);
+    var prov = Provider.of<EvenementProv>(context);
     final maintenant = DateTime.now();
 
-    List<Evenement> events = prov.evenements.where((event) {
+    List<Evenement> events = prov.objets.where((event) {
       return event.debut.day == maintenant.day &&
           event.debut.month == maintenant.month &&
           event.debut.year == maintenant.year;
@@ -31,13 +31,23 @@ class _AccueilScreenState extends State<AccueilScreen> {
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
-              Column(children: [Info(), SizedBox(height: 10), Productivite()]),
-              SizedBox(width: 10),
+              Padding(padding: const EdgeInsets.all(10)),
+              Column(
+                children: [
+                  Info(),
+                  SizedBox(height: 10),
+                  Productivite(),
+                  // SizedBox(width: 10),
+                ],
+              ),
+              // SizedBox(width: 10),
               Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -67,12 +77,13 @@ class _AccueilScreenState extends State<AccueilScreen> {
                     ),
                 ],
               ),
+              SizedBox(height: 10),
             ],
           ),
           SizedBox(height: 10),
-          Taches(),
-          SizedBox(height: 10),
 
+          MesTaches(),
+          SizedBox(height: 10),
         ],
       ),
     );

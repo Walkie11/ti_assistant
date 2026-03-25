@@ -28,30 +28,31 @@ class _ProductiviteState extends State<Productivite> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.40,
       alignment: Alignment.center,
-      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.24 ),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.24,
+      ),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 236, 227, 209),
         borderRadius: BorderRadius.circular(15),
       ),
-      child: GridView.builder(
-        reverse: true,
-        physics: NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.all(10),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 30,
-        ),
-        itemCount: taches.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.all(1),
-            color: taches[index].statut.toLowerCase() == "complété"
-                ? const Color.fromARGB(255, 19, 151, 15)
-                : taches[index].statut.toLowerCase() == "en cours"
-                ? const Color.fromARGB(255, 255, 85, 7)
-                : Colors.white,
-          );
-        },
-      ),
+      // child: GridView.builder(
+      //   reverse: true,
+      //   physics: NeverScrollableScrollPhysics(),
+      //   padding: EdgeInsets.all(10),
+      //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      //     crossAxisCount: 30,
+      //   ),
+      //   itemCount: taches.length,
+      //   itemBuilder: (context, index) {
+      //     return Container(
+      //       margin: EdgeInsets.all(1),
+      //       color: taches[index].statut.toLowerCase() == "complété"
+      //           ? const Color.fromARGB(255, 19, 151, 15)
+      //           : taches[index].statut.toLowerCase() == "en cours"
+      //           ? const Color.fromARGB(255, 255, 85, 7)
+      //           : Colors.white,
+      //     );
+      //   },
+      // ),
     );
   }
 }
